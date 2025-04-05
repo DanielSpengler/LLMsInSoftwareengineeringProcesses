@@ -2,17 +2,15 @@ import ollama
 import logging
 
 model_id = "llama3.1:8b"
-message = "Hello! What is the capital of France?"
+blind_response = "Hello I am a requirements integration model. I can help you with requirements and user stories."
 
-def get_which_model(user_message):
-    # Decide which model to use based on the user message
-    prompt = "You are a helpful assistant. Please decide if the user wants to create user stories or code snippets. "
-    prompt += "Depending on the results only answer in only one word: 'requirements' or 'code'. If it's not clear, answer 'default'. "
-    logging.info(f"Using prompt: {prompt}")
+def get_response(user_message):
+    # Here you can integrate with your actual chat model or logic
+    prompt = "You are a helpful assistant. Please generate a user story based on the following requirements: "
     prompt += f"User message: {user_message}"
     
     logging.info(f"Running Ollama ...")
-    answer = ollama.generate(model=model_id, prompt=prompt)
-    logging.info(f"Answer: {answer['response']}")
-    print(answer["response"])
-    return answer["response"].strip()
+    # answer = ollama.generate(model=model_id, prompt=prompt)
+    answer = blind_response
+    logging.info(f"Answer: {answer}")
+    return answer.strip()
