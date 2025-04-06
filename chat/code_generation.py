@@ -1,16 +1,24 @@
 import ollama
 import logging
 
-model_id = "codellama:latest"
+from enum import Enum
+
 blind_response = "Hello I am a code generation model. I can help you with code snippets and programming tasks."
 
+class PossibleModels(Enum):
+    CODELLAMA = {"name": "Codellama", "model_id": "codellama"}
+    DEEPSEEKR1 = {"name": "DeepSeek-Coder-V2", "model_id": "deepseek-coder-v2"}
+
+def get_possible_chat_models():
+    return [model.value["name"] for model in PossibleModels]    
+
 def get_response(selected_model, user_message):
-    # Here you can integrate with your actual chat model or logic
     prompt = "You are a helpful assistant. Please generate a user story based on the following requirements: "
     prompt += f"User message: {user_message}"
     
     logging.info(f"Running Ollama ...")
-    logging.info(f"Using model: {selected_model}")
+    model_id = [model.value["model_id"] for model in PossibleModels if model.value["name"] == selected_model][0]
+    logging.info(f"Using model: {selected_model} with id: {model_id}")
     # answer = ollama.generate(model=model_id, prompt=prompt)
     answer = blind_response
     logging.info(f"Answer: {answer}")

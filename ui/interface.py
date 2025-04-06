@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import scrolledtext, ttk
 import chat.chat_model as chat_model
-import logging
 from chat.chat_model import ChatMode
+import logging
 
 def send_message(chat_display, mode, entry, selected_model):
     user_message = entry.get()
@@ -28,7 +28,9 @@ def create_chat_tab(tab, mode):
     model_label = tk.Label(model_frame, text="Select Model:")
     model_label.pack(side=tk.LEFT, padx=(0, 5), pady=5)
 
-    model_options = ["Model A", "Model B", "Model C"]  # Example models
+    # Get possible chat models based on the mode
+    model_options = chat_model.get_possible_chat_models(mode)
+    
     selected_model = tk.StringVar(value=model_options[0])
     model_dropdown = ttk.Combobox(model_frame, textvariable=selected_model, values=model_options, state="readonly")
     model_dropdown.pack(side=tk.LEFT, pady=5)
