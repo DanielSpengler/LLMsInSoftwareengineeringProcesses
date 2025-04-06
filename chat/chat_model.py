@@ -17,7 +17,7 @@ def decide_which_model(user_message):
     logging.info(f"Deciding model for message: {user_message}")
     return requirements_integration.get_which_model(user_message)
 
-def get_response(mode, user_message):
+def get_response(mode, selected_model, user_message):
     if not user_message.strip():
         return "Please enter a valid message."
     
@@ -25,10 +25,10 @@ def get_response(mode, user_message):
         case ChatMode.REQUIREMENTS:
             logging.info(f"User story detected: {user_message}")
             # Here you can integrate with your actual chat model or logic        
-            return requirements_integration.get_response(user_message)
+            return requirements_integration.get_response(selected_model, user_message)
         case ChatMode.CODE_GENERATION:
             logging.info(f"Code snippet detected: {user_message}") 
-            return code_integration.get_response(user_message)
+            return code_integration.get_response(selected_model, user_message)
         case _:
             # Default response for other messages
             # Here you can integrate with your actual chat model or logic   
