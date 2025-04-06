@@ -3,7 +3,8 @@ import logging
 
 from enum import Enum
 
-blind_response = "Hello I am a code generation model. I can help you with code snippets and programming tasks."
+WELCOME_MESSAGE = "Hello I am a code generation model. I can help you with code snippets and programming tasks."
+blind_response = "This is a blind response. The actual model response will be generated later."
 
 class PossibleModels(Enum):
     CODELLAMA = {"name": "Codellama", "model_id": "codellama"}
@@ -11,6 +12,10 @@ class PossibleModels(Enum):
 
 def get_possible_chat_models():
     return [model.value["name"] for model in PossibleModels]    
+
+def get_welcome_message():
+    return WELCOME_MESSAGE
+
 
 def get_response(selected_model, user_message):
     prompt = "You are a helpful assistant. Please generate a user story based on the following requirements: "

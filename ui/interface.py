@@ -38,14 +38,16 @@ def create_chat_tab(tab, mode):
     # Chat display area (scaled down)
     chat_display = scrolledtext.ScrolledText(frame, wrap=tk.WORD, state='normal', height=15)  # Reduced height
     chat_display.pack(padx=10, pady=5, fill=tk.BOTH, expand=True)
-
+    
+    chat_display.insert(tk.END, f'Bot: {chat_model.get_welcome_message(mode)}\n')
+    
     # Frame for entry and send button
     input_frame = tk.Frame(frame)
     input_frame.pack(padx=10, pady=5, fill=tk.X)
 
     entry = tk.Entry(input_frame, width=40)
     entry.pack(side=tk.LEFT, padx=(0, 5), pady=5)
-
+    
     send_button = tk.Button(input_frame, text='Send', command=lambda: send_message(chat_display, mode, entry, selected_model))
     send_button.pack(side=tk.LEFT, pady=5)
 

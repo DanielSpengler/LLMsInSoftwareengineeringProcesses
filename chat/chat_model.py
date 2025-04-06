@@ -22,6 +22,18 @@ def get_possible_chat_models(mode):
             logging.warning(f"Unknown mode: {mode}. Returning empty list.")
             # we should not reach here
             return []
+        
+def get_welcome_message(mode):
+    logging.info(f"Getting welcome message for mode: {mode}")
+    match mode:
+        case ChatMode.REQUIREMENTS:
+            return requirements_integration.get_welcome_message()
+        case ChatMode.CODE_GENERATION:
+            return code_integration.get_welcome_message()
+        case _:
+            logging.warning(f"Unknown mode: {mode}. Returning empty string.")
+            # we should not reach here
+            return ""
 
 def get_response(mode, selected_model, user_message):
     if not user_message.strip():
