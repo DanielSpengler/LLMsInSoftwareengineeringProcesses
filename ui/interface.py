@@ -27,7 +27,7 @@ def create_chat_display(parent, height=DEFAULT_CHAT_DISPLAY_HEIGHT):
     chat_display.pack(padx=10, pady=5, fill=tk.BOTH, expand=True)
     return chat_display
 
-def send_message(chat_display, mode, entry, selected_model):
+def send_message(chat_display, mode, selected_model, entry):
     user_message = entry.get().strip()
     if not user_message:
         # ignore empty messages
@@ -64,10 +64,10 @@ def create_chat_tab(tab_control, mode):
     entry = tk.Entry(input_frame, width=40)
     entry.pack(side=tk.LEFT, padx=(0, 5), pady=5)
 
-    send_button = tk.Button(input_frame, text='Send', command=lambda: send_message(chat_display, mode, entry, selected_model))
+    send_button = tk.Button(input_frame, text='Send', command=lambda: send_message(chat_display, mode, selected_model, entry))
     send_button.pack(side=tk.LEFT, pady=5)
 
-    entry.bind('<Return>', lambda event: send_message(chat_display, mode, entry, selected_model))
+    entry.bind('<Return>', lambda event: send_message(chat_display, mode, selected_model, entry))
 
     return chat_display, entry
 

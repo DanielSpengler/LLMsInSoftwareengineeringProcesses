@@ -27,5 +27,6 @@ class CodeGeneration(ChatModelBase):
         logging.info(f"Using model: {selected_model} with id: {model_id}")
         # answer = ollama.generate(model=model_id, prompt=prompt)
         answer = blind_response
+        # FIXME Remove this log after testing
         logging.info(f"Answer: {answer}")
         return answer.strip()
