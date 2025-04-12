@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import scrolledtext, ttk
 import chat.chat_model as chat_model
+import export.export_utility as export_util
 from chat.chat_model import ChatMode
 import logging
 
@@ -8,6 +9,39 @@ import logging
 WINDOW_TITLE = "Chat Interface"
 WINDOW_SIZE = "400x500"
 DEFAULT_CHAT_DISPLAY_HEIGHT = 15
+
+class ScrollableTextWithButtons(tk.Frame):
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent)
+
+        # Create a canvas and scrollbar
+        self.canvas = tk.Canvas(self, bg="white")  # Set background to white
+        self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # Create a frame inside the canvas
+        self.text_frame = tk.Frame(self.canvas, bg="white")  # Set background to white
+        self.canvas.create_window((0, 0), window=self.text_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Configure scrolling
+        self.text_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+
+
+    def add_message(self, message, with_export=False):
+        """Add a message to the chat display with an optional export button."""
+        colour = "light grey" if "You:" in message else "grey"
+        label = tk.Label(self.text_frame, text=message, anchor="w", justify="left", wraplength=350, bg=colour)
+        label.pack(fill=tk.X, padx=10, pady=2, anchor="w")
+
+        if with_export:
+            export_button = tk.Button(self.text_frame, text="Export", command=lambda: self.export_message(message))
+            export_button.pack(padx=10, pady=2, anchor="w")
+
+    def export_message(self, message):
+        export_util.open_export_window(message)  # Open the export window to select file location
+        logging.info("Message exported")
 
 def create_dropdown(parent, label_text, options, default_value):
     frame = tk.Frame(parent)
@@ -22,26 +56,27 @@ def create_dropdown(parent, label_text, options, default_value):
 
     return selected_value
 
-def create_chat_display(parent, height=DEFAULT_CHAT_DISPLAY_HEIGHT):
-    chat_display = scrolledtext.ScrolledText(parent, wrap=tk.WORD, state='normal', height=height)
+def create_chat_display(parent):
+    """Create a scrollable chat display with support for embedded buttons."""
+    chat_display = ScrollableTextWithButtons(parent)
     chat_display.pack(padx=10, pady=5, fill=tk.BOTH, expand=True)
     return chat_display
 
 def send_message(chat_display, mode, selected_model, entry):
+    """Handle sending a message and displaying the bot's response."""
     user_message = entry.get().strip()
     if not user_message:
-        # ignore empty messages
+        chat_display.add_message("You: [Empty message]")
         return
 
-    # FIXME Remove this log after testing
     logging.info(f"Message received: {user_message}")
-    chat_display.insert(tk.END, f'You: {user_message}\n')
+    chat_display.add_message(f"You: {user_message}")
     entry.delete(0, tk.END)
 
+    # Use the selected model for response
     logging.info(f"Using chat model: {selected_model.get()}")
     response = chat_model.get_response(mode, selected_model.get(), user_message)
-    chat_display.insert(tk.END, f'Bot: {response}\n')
-    chat_display.see(tk.END)
+    chat_display.add_message(f"Bot: {response}", with_export=True)
 
 def create_chat_tab(tab_control, mode):
     frame = ttk.Frame(tab_control)
@@ -55,7 +90,7 @@ def create_chat_tab(tab_control, mode):
     chat_display = create_chat_display(frame)
 
     # Add welcome message
-    chat_display.insert(tk.END, f'Bot: {chat_model.get_welcome_message(mode)}\n')
+    chat_display.add_message(f'Bot: {chat_model.get_welcome_message(mode)}')
 
     # Input frame with entry and send button
     input_frame = tk.Frame(frame)
