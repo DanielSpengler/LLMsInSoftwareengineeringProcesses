@@ -38,10 +38,17 @@ class ScrollableTextWithButtons(tk.Frame):
         if with_export:
             export_button = tk.Button(self.text_frame, text="Export", command=lambda: self.export_message(message))
             export_button.pack(padx=10, pady=2, anchor="w")
+            send_button = tk.Button(self.text_frame, text="Send to other chat mode", command=lambda: self.send_message_to_other_chat_mode(message, ChatMode.CODE_GENERATION))
+            send_button.pack(padx=10, pady=2, anchor="w")
 
     def export_message(self, message):
         export_util.open_export_window(message)  # Open the export window to select file location
         logging.info("Message exported")
+        
+    def send_message_to_other_chat_mode(self, message, chat_mode):
+        #*Send a message to another chat mode."""
+        logging.info(f"Sending to chat mode: {chat_mode}")
+        
 
 def create_dropdown(parent, label_text, options, default_value):
     frame = tk.Frame(parent)
@@ -57,13 +64,11 @@ def create_dropdown(parent, label_text, options, default_value):
     return selected_value
 
 def create_chat_display(parent):
-    """Create a scrollable chat display with support for embedded buttons."""
     chat_display = ScrollableTextWithButtons(parent)
     chat_display.pack(padx=10, pady=5, fill=tk.BOTH, expand=True)
     return chat_display
 
 def send_message(chat_display, mode, selected_model, entry):
-    """Handle sending a message and displaying the bot's response."""
     user_message = entry.get().strip()
     if not user_message:
         chat_display.add_message("You: [Empty message]")
@@ -86,9 +91,7 @@ def create_chat_tab(tab_control, mode):
     model_options = chat_model.get_possible_chat_models(mode)
     selected_model = create_dropdown(frame, "Select Model:", model_options, model_options[0])
 
-    # Chat display area
     chat_display = create_chat_display(frame)
-
     # Add welcome message
     chat_display.add_message(f'Bot: {chat_model.get_welcome_message(mode)}')
 
@@ -115,8 +118,7 @@ def start_chat_interface():
     tab_control.pack(expand=1, fill='both')
 
     # Create tabs for each chat mode
-    # ChatMode.values()  # Ensure all modes are loaded
-    chat_modes = [ChatMode.REQUIREMENTS, ChatMode.CODE_GENERATION]
+    chat_modes = ChatMode.__members__.values()
     for mode in ChatMode:
         create_chat_tab(tab_control, mode)
 

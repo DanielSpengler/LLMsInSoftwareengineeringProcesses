@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import ollama
 
 class ChatModelBase(ABC):
     @abstractmethod
@@ -15,3 +16,12 @@ class ChatModelBase(ABC):
     def get_response(self, selected_model, user_message):
         """Generate a response based on the selected model and user message."""
         pass
+    
+    def is_model_running(model_name):
+        processes = ollama.ps()  # get the list of running processes
+        for process in processes.models:
+            print(f"Process: {process}")
+            if process.name == model_name:
+                return True
+        return False
+        

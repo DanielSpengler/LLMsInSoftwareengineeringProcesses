@@ -1,5 +1,5 @@
 from chat.requirements_integration import RequirementsIntegration
-from chat.code_generation import CodeGeneration
+from chat.code_generation_integration import CodeGenerationIntegration
 from enum import Enum
 import logging
 
@@ -11,7 +11,7 @@ class ChatMode(Enum):
 # Map modes to their respective implementations
 chat_mode_mapping = {
     ChatMode.REQUIREMENTS: RequirementsIntegration(),
-    ChatMode.CODE_GENERATION: CodeGeneration(),
+    ChatMode.CODE_GENERATION: CodeGenerationIntegration(),
 }
 
 def get_possible_chat_models(mode):
@@ -40,4 +40,3 @@ def get_response(mode, selected_model, user_message):
     
     logging.warning(f"Unknown mode: {mode}. Returning default response.")
     return "default"
-
