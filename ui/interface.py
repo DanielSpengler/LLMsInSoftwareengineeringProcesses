@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import scrolledtext, ttk
 import chat.chat_model as chat_model
-import export.export_utility as export_util
+import ui.export_interface as export_util
 from chat.chat_model import ChatMode
 import logging
 
