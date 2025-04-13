@@ -3,6 +3,7 @@ import logging
 
 from enum import Enum
 from chat.chat_model_base import ChatModelBase
+from chat.custom.code_generation import ExampleIntegration
 
 WELCOME_MESSAGE = "Hello I am a code generation model. I can help you with code snippets and programming tasks."
 blind_response = "This is a blind response. The actual model response will be generated later."
@@ -13,6 +14,11 @@ MESSAGE_WRAPPER = "create one or more user stories using the following message: 
 class PossibleModels(Enum):
     CODELLAMA = {"name": "Codellama", "model_id": "codellama"}
     DEEPSEEKR1 = {"name": "DeepSeek-Coder-V2", "model_id": "deepseek-coder-v2"}
+    CUSTOM_MODEL = {"name": "Example custom model", "model_id": "example-id"}
+
+custom_integrations = {
+    PossibleModels.CUSTOM_MODEL : ExampleIntegration.get_response
+}
 
 class CodeGenerationIntegration(ChatModelBase):
     def get_possible_chat_models(self):
@@ -21,8 +27,18 @@ class CodeGenerationIntegration(ChatModelBase):
     def get_welcome_message(self):
         return WELCOME_MESSAGE
 
-    def get_response(self, selected_model, user_message):
+    def get_response(self, selected_model_name, user_message):
         prompt = MESSAGE_WRAPPER.replace("<message>", user_message)
+        
+        # find model from name
+        selected_model = [model for model in PossibleModels if model.value["name"] == selected_model_name][0]
+        model_id = selected_model.value["model_id"]
+        logging.info(f"Using model: {selected_model} with id: {model_id}")
+        
+        if selected_model in custom_integrations.keys():
+            # if model has a custom integration, use it instead
+            logging.info(f"Using custom integration for model: {selected_model_name}")
+            return custom_integrations[selected_model](self, model_id, user_message)
         
         logging.info(f"Running Ollama ...")
         model_id = [model.value["model_id"] for model in PossibleModels if model.value["name"] == selected_model][0]

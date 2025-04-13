@@ -3,7 +3,7 @@ import logging
 
 from enum import Enum
 from chat.chat_model_base import ChatModelBase
-from chat.custom import ChatGPTIntegration
+from chat.custom.requirements import ChatGPTIntegration
 
 WELCOME_MESSAGE = "Hello I am a requirements integration model. I can help you with requirements and user stories."
 blind_response = "This is a blind response. The actual model response will be generated later."
@@ -37,7 +37,7 @@ class RequirementsIntegration(ChatModelBase):
         logging.info(f"Using model: {selected_model} with id: {model_id}")
         
         if selected_model in custom_integrations.keys():
-            # if model is a custom integration, use the custom integration to get the response
+            # if model has a custom integration, use it instead
             logging.info(f"Using custom integration for model: {selected_model_name}")
             return custom_integrations[selected_model](self, model_id, user_message)
         
