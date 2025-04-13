@@ -3,6 +3,7 @@ import logging
 
 from enum import Enum
 from chat.chat_model_base import ChatModelBase
+from chat.custom import ChatGPTIntegration
 
 WELCOME_MESSAGE = "Hello I am a requirements integration model. I can help you with requirements and user stories."
 blind_response = "This is a blind response. The actual model response will be generated later."
@@ -14,6 +15,11 @@ class PossibleModels(Enum):
     LLAMA3 = {"name": "Llama 3.1", "model_id": "llama3.1:8b"}
     MIXTRAL = {"name": "Mixtral", "model_id": "mixtral"}
     DEEPSEEKR1 = {"name": "DeepSeek R1", "model_id": "deepseek-r1:8b-llama-distill-q8_0"}
+    CHATGPT = {"name": "ChatGpt", "model_id": "o3-mini-2025-01-31"}
+
+custom_integrations = {
+    PossibleModels.CHATGPT : ChatGPTIntegration.get_response
+}
 
 class RequirementsIntegration(ChatModelBase):
     def get_possible_chat_models(self):
@@ -22,14 +28,20 @@ class RequirementsIntegration(ChatModelBase):
     def get_welcome_message(self):
         return WELCOME_MESSAGE
 
-    def get_response(self, selected_model, user_message):
+    def get_response(self, selected_model_name, user_message):
         prompt = MESSAGE_WRAPPER.replace("<message>", user_message)
-                
-        logging.info(f"Running Ollama ...")
-        # find model_id from selected_model
-        model_id = [model.value["model_id"] for model in PossibleModels if model.value["name"] == selected_model][0]
+                        
+        # find model from name
+        selected_model = [model for model in PossibleModels if model.value["name"] == selected_model_name][0]
+        model_id = selected_model.value["model_id"]
         logging.info(f"Using model: {selected_model} with id: {model_id}")
         
+        if selected_model in custom_integrations.keys():
+            # if model is a custom integration, use the custom integration to get the response
+            logging.info(f"Using custom integration for model: {selected_model_name}")
+            return custom_integrations[selected_model](self, model_id, user_message)
+        
+        logging.info(f"Running Ollama ...")
         if not self.is_model_running(model_id):
             # if model is not running, start it with PROMPT
             logging.info(f"Model {model_id} not running. Starting it with prompt.")
