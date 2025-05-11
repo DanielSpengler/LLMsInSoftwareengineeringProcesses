@@ -6,7 +6,7 @@ from chat.chat_model import ChatMode
 import logging
 
 # Configuration
-WINDOW_TITLE = "Chat Interface"
+WINDOW_TITLE = "LLMs in Software Engineering"
 WINDOW_SIZE = "400x500"
 DEFAULT_CHAT_DISPLAY_HEIGHT = 15
 
@@ -28,7 +28,6 @@ class ScrollableTextWithButtons(tk.Frame):
         # Configure scrolling
         self.text_frame.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
 
-
     def add_message(self, message, with_export=False):
         """Add a message to the chat display with an optional export button."""
         colour = "light grey" if "You:" in message else "grey"
@@ -38,8 +37,8 @@ class ScrollableTextWithButtons(tk.Frame):
         if with_export:
             export_button = tk.Button(self.text_frame, text="Export", command=lambda: self.export_message(message))
             export_button.pack(padx=10, pady=2, anchor="w")
-            send_button = tk.Button(self.text_frame, text="Send to other chat mode", command=lambda: self.send_message_to_other_chat_mode(message, ChatMode.CODE_GENERATION))
-            send_button.pack(padx=10, pady=2, anchor="w")
+            # send_button = tk.Button(self.text_frame, text="Send to other chat mode", command=lambda: self.send_message_to_other_chat_mode(message, ChatMode.CODE_GENERATION))
+            # send_button.pack(padx=10, pady=2, anchor="w")
 
     def export_message(self, message):
         export_util.open_export_window(message)  # Open the export window to select file location
@@ -80,8 +79,9 @@ def send_message(chat_display, mode, selected_model, entry):
 
     # Use the selected model for response
     logging.info(f"Using chat model: {selected_model.get()}")
+    # FIXME maybe subprocess?
     response = chat_model.get_response(mode, selected_model.get(), user_message)
-    chat_display.add_message(f"Bot: {response}", with_export=True)
+    chat_display.add_message(f"Bot ({selected_model.get()}): {response}", with_export=True)
 
 def create_chat_tab(tab_control, mode):
     frame = ttk.Frame(tab_control)
@@ -93,7 +93,7 @@ def create_chat_tab(tab_control, mode):
 
     chat_display = create_chat_display(frame)
     # Add welcome message
-    chat_display.add_message(f'Bot: {chat_model.get_welcome_message(mode)}')
+    # chat_display.add_message(f'Bot: {chat_model.get_welcome_message(mode)}')
 
     # Input frame with entry and send button
     input_frame = tk.Frame(frame)
